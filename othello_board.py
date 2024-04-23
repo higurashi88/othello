@@ -9,27 +9,25 @@ def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.MainAxisAlignment.CENTER
 
-    cell = ft.Container(
-        bgcolor=ft.colors.GREEN,
-        width=75,
-        height=75,
-        border_radius=10,
-        on_click=lambda e: print("Clickable without Ink clicked!"),
-    )
-
-    culumn = []
-    for i in range(8):
-        culumn.append(cell)
-
+    # オセロ盤のマスを作成
     row = []
-    for i in range(8):
-        row.append(ft.Row(culumn))
+    board = []
 
-    page.add(
-        ft.Column(
-            row
-        )
-    )
+    for i in range(8):
+        for j in range(8):
+            culumn = ft.Container(
+                bgcolor=ft.colors.GREEN,
+                width=75,
+                height=75,
+                border_radius=10,
+                on_click=lambda e: print(f"place {i},{j}")
+            )
+            row.append(culumn)
+            print(i, j)
+        board.append(ft.Row(row))
+
+    # オセロ盤をページに追加
+    page.add(ft.Column(board))
 
 
 ft.app(target=main)
