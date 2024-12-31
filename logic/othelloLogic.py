@@ -4,7 +4,7 @@ import sys
 
 pygame.init()
 # ウィンドウサイズの設定
-screen = pygame.display.set_mode((Board.SIZE, Board.SIZE))
+screen = pygame.display.set_mode((Board.SIZE, Board.SIZE + 60))
 # ウィンドウタイトルの設定
 pygame.display.set_caption("オセロ")
 
@@ -27,6 +27,7 @@ class Othello:
         self.turn = Board.BLACK
 
     # ボードの描画
+
     def draw_board(self):
         screen.fill(Board.GREEN)
         for x in range(Board.BOARD_SIZE):
@@ -41,6 +42,20 @@ class Othello:
     def draw_stone(self, x, y, color):
         pygame.draw.circle(screen, color, (x * Board.GRID_SIZE + Board.GRID_SIZE //
                            2, y * Board.GRID_SIZE + Board.GRID_SIZE // 2), Board.GRID_SIZE // 2 - 4)
+        self.draw_turn(Board.SIZE // 2, Board.SIZE + 30)
+
+    # どっちの順番か表示
+    def draw_turn(self, x, y):
+        # フォントの作成
+        font = pygame.font.Font(None, 48)  # フォントサイズの指定
+        turn_msg = "Black turn"
+        text_color = Board.BLACK
+        if self.turn == Board.WHITE:
+            turn_msg = "White turn"
+            text_color = Board.WHITE
+        text = font.render(turn_msg, True, text_color)
+        text_rect = text.get_rect(center=(x, y))
+        screen.blit(text, text_rect)
 
     # 次の手の存在確認
     def has_valid_move(self):
@@ -52,23 +67,27 @@ class Othello:
 
     # 有効な手かの確認
     def is_valid_move(self, x, y):
-        if self.board[x][y] is not None:
-            return False
-        opponent = Board.WHITE if self.turn == Board.BLACK else Board.BLACK
-        valid = False
-        for dx, dy in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < Board.BOARD_SIZE and 0 <= ny < Board.BOARD_SIZE and self.board[nx][ny] == opponent:
-                while 0 <= nx < Board.BOARD_SIZE and 0 <= ny < Board.BOARD_SIZE:
-                    nx += dx
-                    ny += dy
-                    if not (0 <= nx < Board.BOARD_SIZE and 0 <= ny < Board.BOARD_SIZE):
-                        break
-                    if self.board[nx][ny] is None:
-                        break
-                    if self.board[nx][ny] == self.turn:
-                        valid = True
-                        break
+        try:
+            if self.board[x][y] is not None:
+                return False
+            opponent = Board.WHITE if self.turn == Board.BLACK else Board.BLACK
+            valid = False
+            for dx, dy in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < Board.BOARD_SIZE and 0 <= ny < Board.BOARD_SIZE and self.board[nx][ny] == opponent:
+                    while 0 <= nx < Board.BOARD_SIZE and 0 <= ny < Board.BOARD_SIZE:
+                        nx += dx
+                        ny += dy
+                        if not (0 <= nx < Board.BOARD_SIZE and 0 <= ny < Board.BOARD_SIZE):
+                            break
+                        if self.board[nx][ny] is None:
+                            break
+                        if self.board[nx][ny] == self.turn:
+                            valid = True
+                            break
+        except Exception as e:
+            print("範囲外もしくは予期せぬエラーです")
+            valid = False
         return valid
 
     # 石の配置と反転
